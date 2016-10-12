@@ -26,9 +26,13 @@ class DanhaoController extends Controller
 //                dd(Excel::load($ckdh,function($reader){ dd($reader->all());}));
                 $ckdh = null;
                 foreach ($date as $val) {
+                    if(!is_array($val)  || count($val) != 3){
+                        continue;
+                    }
                     foreach ($val as $vala) {
                         $body[] = $vala;
                     }
+
                     $key = $body[0];
                     if(intval($body[1]) > 0){ $body[1] = round(floatval(intval($body[1]) / 1000),2); }
                     $table[$key]['ck'] = array('kg' => $body[1], 'fy' => $body[2]);
@@ -40,6 +44,9 @@ class DanhaoController extends Controller
                 $date =  Excel::load($kddh)->get()->toArray();
                 $count['kd'] = count($date);
                 foreach($date as  $val){
+                    if(!is_array($val)  || count($val) != 3){
+                        continue;
+                    }
                     foreach($val as  $vala ){
                         $body[] = $vala;
                     }
