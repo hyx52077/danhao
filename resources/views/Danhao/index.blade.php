@@ -38,39 +38,16 @@
             <div class="col-md-8 col-md-offset-2">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        @if(isset($dh_count))
-                            快递 <code>{{ $dh_count['kd'] or '0' }}</code>
-                            仓库 <code>{{ $dh_count['ck'] or '0' }}</code>
-
-                        @endif
+                       使用说明
                     </div>
 
                     <div class="panel-body">
-                        <table class="table table-striped">
-                            <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>单号</th>
-                                <th>重量</th>
-                                <th>运费</th>
-                                <th>出错</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            @if (isset($danhao))
-                                <?php $i = 0;?>
-@foreach($danhao as $key => $item )
+                        <ul>
+                            <li>自动转换千克</li>
+                            <li>默认第一行内容不做使用</li>
+                            <li>注意 · 请保持3列,第一列=<code>单号</code>,第二列=<code>重量</code>,第三列=<code>运费</code></li>
+                        </ul>
 
-                            <tr>
-                                <td><?php echo ++$i ; ?></td>
-                                <td>{{$key}}</td>
-                                <td>快递kg <code>{{$item['kd']['kg'] or 'null' }}</code> / <code>{{$item['ck']['kg'] or 'null'}}</code> 仓库kg</td>
-                                <td>快递yf <code>{{$item['kd']['fy'] or 'null' }}</code> / <code>{{$item['ck']['fy'] or 'null'}}</code> 仓库yf</td>
-                            </tr>
-@endforeach
-@endif
-                            </tbody>
-                        </table>
                     </div>
                 </div>
 
