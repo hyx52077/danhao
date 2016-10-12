@@ -1,11 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
-
 use Illuminate\Http\Request;
 
-use App\Http\Requests;
-use Illuminate\Support\Facades\Storage;
 use Excel;
 
 class DanhaoController extends Controller
@@ -15,6 +12,7 @@ class DanhaoController extends Controller
         $i = function ($d){
             return $d?$d:'null';
         };
+
         if ($request->isMethod('post')) {
 
             $name =  md5(time() . rand(0, 10000)) . '.' ;
@@ -32,6 +30,7 @@ class DanhaoController extends Controller
                         $body[] = $vala;
                     }
                     $key = $body[0];
+                    if(intval($body[1]) > 0){ $body[1] = round(floatval(intval($body[1]) / 1000),2); }
                     $table[$key]['ck'] = array('kg' => $body[1], 'fy' => $body[2]);
                     $table[$key]['kd'] = array('kg' => 'null','fy' => 'null');
                     $body = null;
@@ -46,7 +45,7 @@ class DanhaoController extends Controller
                     }
                     $key = $body[0];
                     $table[$key]['kd'] = array('kg' => $body[1],'fy'=>$body[2]);
-                    if(!isset($table[$key]['ck'])){ $table[$key]['ck'] = array('kg' => 'null', 'fy' => 'null');}
+                    if(!isset($table[$key]['ck'])){ $table[$key]['ck'] = array('kg' => 'null', 'fy' => 'null'); }
                     $body = null;
                 }
                 $xls = array();
@@ -66,9 +65,6 @@ class DanhaoController extends Controller
                 return view('Danhao.index' ,['danhao' => $table ,'dh_count' => $count] );
             }
             return view('Danhao.index' );
-
-        }else{
-            $ad = '等待上传';
         }
 
 
