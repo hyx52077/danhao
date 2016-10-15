@@ -25,12 +25,14 @@ class DanhaoController extends Controller
                 $count['ck'] = count($date);
 //                dd(Excel::load($ckdh,function($reader){ dd($reader->all());}));
                 $ckdh = null;
+                $body = null;
                 foreach ($date as $val) {
-                    if(!is_array($val)  || count($val) != 3){
-                        continue;
-                    }
+
                     foreach ($val as $vala) {
                         $body[] = $vala;
+                    }
+                    if(count($body) != 3){
+                        continue;
                     }
 
                     $key = $body[0];
@@ -39,25 +41,25 @@ class DanhaoController extends Controller
                     $table[$key]['kd'] = array('kg' => 'null','fy' => 'null');
                     $body = null;
                 }
+                $body = null;
                 $newFileName = $name . $request->kddh->getClientOriginalExtension();
                 $kddh = $request->kddh->move('xls' ,$newFileName );
                 $date =  Excel::load($kddh)->get()->toArray();
                 $count['kd'] = count($date);
                 foreach($date as  $val){
-                    if(!is_array($val)  || count($val) != 3){
-                        continue;
-                    }
                     foreach($val as  $vala ){
                         $body[] = $vala;
                     }
+                    if(count($body) != 3){
+                        continue;
+                    }
                     $key = $body[0];
                     $table[$key]['kd'] = array('kg' => $body[1],'fy'=>$body[2]);
-                    if(!isset($table[$key]['ck'])){ $table[$key]['ck'] = array('kg' => 'null', 'fy' => 'null'); }
+                    if(!isset($table[$key]['ck'])){ $table[$key]['ck'] = array('kg' => 'no', 'fy' => 'no'); }
                     $body = null;
                 }
                 $xls = array();
                 foreach($table as $Key => $val){
-
                     $xls[] = array($Key,$i($val['kd']['kg']),$i($val['ck']['kg']),$i($val['kd']['fy']),$i($val['ck']['fy']));
                 }
                 Excel::create('新的数据表', function($excel) use($xls) {
