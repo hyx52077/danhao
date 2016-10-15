@@ -10,7 +10,7 @@ class DanhaoController extends Controller
     //
     public function index(Request $request){
         $i = function ($d){
-            return $d?$d:'null';
+            return $d != null || intval($d)> 0?$d:'0';
         };
 
         if ($request->isMethod('post')) {
@@ -36,7 +36,7 @@ class DanhaoController extends Controller
                     }
 
                     $key = $body[0];
-                    if(intval($body[1]) > 0){ $body[1] = round(floatval(intval($body[1]) / 1000),2); }
+                    if(intval($body[1]) > 100){ $body[1] = round(floatval(intval($body[1]) / 1000),2); }
                     $table[$key]['ck'] = array('kg' => $body[1], 'fy' => $body[2]);
                     $table[$key]['kd'] = array('kg' => 'null','fy' => 'null');
                     $body = null;
@@ -55,19 +55,20 @@ class DanhaoController extends Controller
                     }
                     $key = $body[0];
                     $table[$key]['kd'] = array('kg' => $body[1],'fy'=>$body[2]);
-                    if(!isset($table[$key]['ck'])){ $table[$key]['ck'] = array('kg' => 'no', 'fy' => 'no'); }
+                    if(empty($table[$key]['ck'])){ $table[$key]['ck'] = array('kg' => 'no', 'fy' => 'no'); }
                     $body = null;
                 }
                 $xls = array();
                 foreach($table as $Key => $val){
                     $xls[] = array($Key,$i($val['kd']['kg']),$i($val['ck']['kg']),$i($val['kd']['fy']),$i($val['ck']['fy']));
                 }
-                Excel::create('新的数据表', function($excel) use($xls) {
-                    $excel->sheet('Sheetname', function($sheet) use($xls) {
+                Excel::create('新的数据表', function($excel) use($xls ,$count ) {
+                    $excel->sheet('Sheetname', function($sheet) use($xls ,$count ) {
                         $sheet->fromArray($xls);
                         $sheet->row(1, array(
                             '单号','快递重量','仓库重量','快递运费','仓库运费'
                         ));
+                        $sheet->appendRow(array('仓库='.$count['ck'],'快递'.$count['kd']));
                         // Sheet manipulation
                     });
                 })->export('xls');
