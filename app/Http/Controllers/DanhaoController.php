@@ -65,8 +65,8 @@ class DanhaoController extends Controller
                     $mw['kd'] += $val['kd']['fy'];
                     $m = intval($val['ck']['fy']) > 0 ?round(floatval($val['ck']['fy'] - $val['kd']['fy']),2):'0';
                     $xls[] = array($Key,$i($val['kd']['kg']),$i($val['ck']['kg']),$i($val['kd']['fy']),$i($val['ck']['fy']),$m);
-
                 }
+
                 Excel::create('新的数据表', function($excel) use($xls ,$count ,$mw) {
                     $excel->sheet('Sheetname', function($sheet) use($xls ,$count ,$mw) {
 
