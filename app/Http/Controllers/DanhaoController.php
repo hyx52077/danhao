@@ -59,16 +59,23 @@ class DanhaoController extends Controller
                     $body = null;
                 }
                 $xls = array();
+                $mw = array('ck' => 0,'kd' => 0);
                 foreach($table as $Key => $val){
-                    $xls[] = array($Key,$i($val['kd']['kg']),$i($val['ck']['kg']),$i($val['kd']['fy']),$i($val['ck']['fy']));
+                    $mw['ck'] += $val['ck']['fy'];
+                    $mw['kd'] += $val['kd']['fy'];
+                    $m = intval($val['ck']['fy']) > 0 ?round(floatval($val['ck']['fy'] - $val['kd']['fy']),2):'0';
+                    $xls[] = array($Key,$i($val['kd']['kg']),$i($val['ck']['kg']),$i($val['kd']['fy']),$i($val['ck']['fy']),$m);
+
                 }
-                Excel::create('新的数据表', function($excel) use($xls ,$count ) {
-                    $excel->sheet('Sheetname', function($sheet) use($xls ,$count ) {
+                Excel::create('新的数据表', function($excel) use($xls ,$count ,$mw) {
+                    $excel->sheet('Sheetname', function($sheet) use($xls ,$count ,$mw) {
+
                         $sheet->fromArray($xls);
                         $sheet->row(1, array(
-                            '单号','快递重量','仓库重量','快递运费','仓库运费'
+                            '单号','快递重量','仓库重量','快递运费','仓库运费','运费差'
                         ));
-                        $sheet->appendRow(array('仓库='.$count['ck'],'快递'.$count['kd']));
+                        $s = round(floatval($mw['ck'] - $mw['kd']),2);
+                        $sheet->appendRow(array('仓库='.$count['ck'],'快递='.$count['kd'],'仓库-快递=多付值',$mw['ck'].' - '.$mw['kd'].' = '.$s),'负数等多付');
                         // Sheet manipulation
                     });
                 })->export('xls');
