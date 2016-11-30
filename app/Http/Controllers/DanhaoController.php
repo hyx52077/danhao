@@ -1,7 +1,9 @@
 <?php
 
+
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 use Excel;
 
@@ -38,7 +40,7 @@ class DanhaoController extends Controller
                     $key = $body[0];
                     if(intval($body[1]) > 100){ $body[1] = round(floatval(intval($body[1]) / 1000),2); }
                     $table[$key]['ck'] = array('kg' => $body[1], 'fy' => $body[2]);
-                    $table[$key]['kd'] = array('kg' => 'null','fy' => 'null');
+                    $table[$key]['kd'] = array('kg' => 0,'fy' =>0);
                     $body = null;
                 }
                 $body = null;
@@ -54,21 +56,27 @@ class DanhaoController extends Controller
                         continue;
                     }
                     $key = $body[0];
-                    $table[$key]['kd'] = array('kg' => $body[1],'fy'=>$body[2]);
-                    if(empty($table[$key]['ck'])){ $table[$key]['ck'] = array('kg' => 'no', 'fy' => 'no'); }
+                    if(intval($body[1]) > 100){ $body[1] = round(floatval(intval($body[1]) / 1000),2); }
+                    $table[$key]['kd'] = array('kg' => ($body[1]),'fy'=> ($body[2]));
+                    if(empty($table[$key]['ck'])){ $table[$key]['ck'] = array('kg' => 0, 'fy' => 0); }
                     $body = null;
                 }
                 $xls = array();
                 $mw = array('ck' => 0,'kd' => 0);
                 foreach($table as $Key => $val){
-                    $mw['ck'] += $val['ck']['fy'];
-                    $mw['kd'] += $val['kd']['fy'];
+                    $val['ck']['fy'] = floatval($val['ck']['fy']);
+                    $val['kd']['fy'] = floatval($val['kd']['fy']);
+                    $mw['ck'] += intval($val['ck']['fy']);
+                    $mw['kd'] += intval($val['kd']['fy']);
+
                     $m = intval($val['ck']['fy']) > 0 ?round(floatval($val['ck']['fy'] - $val['kd']['fy']),2):'0';
                     $xls[] = array($Key,$i($val['kd']['kg']),$i($val['ck']['kg']),$i($val['kd']['fy']),$i($val['ck']['fy']),$m);
                 }
 
+
                 Excel::create('新的数据表', function($excel) use($xls ,$count ,$mw) {
                     $excel->sheet('Sheetname', function($sheet) use($xls ,$count ,$mw) {
+
 
                         $sheet->fromArray($xls);
                         $sheet->row(1, array(
@@ -79,6 +87,7 @@ class DanhaoController extends Controller
                         // Sheet manipulation
                     });
                 })->export('xls');
+
                 return view('Danhao.index' ,['danhao' => $table ,'dh_count' => $count] );
             }
             return view('Danhao.index' );
@@ -86,6 +95,26 @@ class DanhaoController extends Controller
 
 
         return view('Danhao.index');
+    }
+
+    public function txt(Request $request)
+    {
+        if ($request->isMethod('post')) {
+            $input = $request->all();
+            if (!$input['name'] ){
+                return view('Danhao.txt',['post'=>true,'error'=>'请输入有效名字']);
+            }
+            if (!$input['qq'] && !$input['wx'] && !$input['iphon']){
+                return view('Danhao.txt',['post'=>true,'error'=>'联系方式 3选1']);
+            }
+            unset($input['_token']);
+            DB::table('user')->insert(
+                $input
+            );
+            return view('Danhao.txt',['post'=>true,'add'=>true]);
+
+        }
+        return view('Danhao.txt',['post'=>false,'error'=>false,'add'=>false]);
     }
 
 }

@@ -16,7 +16,7 @@ Route::get('/', function () {
 });
 
 Route::match(['get', 'post'] ,'dh' , 'DanhaoController@index');
-
+Route::match(['get', 'post'] ,'txt' , 'DanhaoController@txt');
 Auth::routes();
 Route::get('excel/export','ExcelController@export');
 Route::get('excel/import','ExcelController@import');
